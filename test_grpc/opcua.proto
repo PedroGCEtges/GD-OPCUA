@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// Definindo o pacote do serviço
+package opcua;
+
+// Definindo a mensagem que será enviada ao serviço
+message OpcuaMessage {
+  string tag = 1; // O nome da tag OPC UA
+  string value = 2; // O valor da tag OPC UA
+}
+
+// Definindo a mensagem que será retornada pelo serviço
+message EmptyMessage {}
+
+// Definindo o serviço OpcuaService
+service OpcuaService {
+  // Definindo o método Notify, que recebe uma OpcuaMessage e retorna uma EmptyMessage
+  rpc Notify(OpcuaMessage) returns (EmptyMessage) {}
+}
