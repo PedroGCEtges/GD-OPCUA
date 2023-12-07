@@ -1,5 +1,6 @@
 import logging
 import datetime
+import copy
 # Definir a formatação do log
 log_format = '%(asctime)s:%(levelname)s:%(filename)s:%(message)s'
 
@@ -12,10 +13,11 @@ logger.setLevel(logging.CRITICAL)
 
 previous_values = {}
 def set_log(tags):
+    tags_bckup = copy.deepcopy(tags)
 
-    for tag in tags:
-        current_value = tag[1]
-        tag_name = tag[0]
+    for tag in tags_bckup:
+        tag_name = tag["name"]
+        current_value = tag["value"]
 
         if tag_name in previous_values:
             if current_value != previous_values[tag_name]:

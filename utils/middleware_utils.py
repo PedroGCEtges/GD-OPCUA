@@ -2,7 +2,7 @@ import time
 import opcua
 
 from alarms.alarm import mostrar_alerta
-from db_utils import create_collection
+from utils.db_utils import create_collection
 
 
 def check_inserted_documents(collection, interval=1 ):
