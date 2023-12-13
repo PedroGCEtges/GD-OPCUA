@@ -1,23 +1,13 @@
+import datetime
 import logging
 import sqlite3
 
-from db_utils import create_collection, mongo_client
-from logs_config import set_log
+from utils.db_utils import add_tags_to_sqlite, create_collection, create_sqlite, mongo_client
+from log.logs_config import set_log
 import opcua
 import time
-from log_utils import log_map_opc
+from log.log_utils import log_map_opc
 
-
-# mongo_client = mongo_client()
-# mongo_db = mongo_client["opcua_db"]
-# mongo_col = mongo_db["opcua_data"]
-
-# # criar uma conexão SQLite e se conectar ao banco de dados SQLite
-# sqlite_conn = sqlite3.connect("opcua.db")
-# sqlite_cur = sqlite_conn.cursor()
-
-# # criar uma tabela SQLite se não existir
-# sqlite_cur.execute("CREATE TABLE IF NOT EXISTS opcua_data (tag TEXT, value TEXT, timestamp TEXT)")
 
 def connect_to_gd_opcua(opc="opc.tcp://localhost:4840"):
     client = opcua.Client(opc)
@@ -31,16 +21,28 @@ def connect_to_gd_opcua(opc="opc.tcp://localhost:4840"):
         print(e)
         client.disconnect()
 
-def read_tags_from_gd(opc="opc.tcp://localhost:4840"):    
+def read_tags_from_gd(opc="opc.tcp://localhost:4840"):   
+        mongo_db = mongo_client()["Teste"]
+        mongo_col = mongo_db["teste"] 
+
         root = connect_to_gd_opcua(opc)
+
         while True:
-            tags = get_tags(root)
-            set_log(tags)
-            time.sleep(0.2)
-            print(tags[23]) #Stop tag
+            tags_dict, tags_sqlite = get_tags(root)
+            set_log(tags_dict)
+            
+            doc = {"timestamp": datetime.datetime.now(),
+               "stations": log_map_opc[opc],
+               "tags": tags_dict}
+            mongo_col.insert_one(doc)
+
+            add_tags_to_sqlite(tags_sqlite)
+            # time.sleep(0.2)
+            # print(tags[23]) #Stop tag
 
 def get_tags(root_node):
     tags = []
+    tags_sqlite = []
 
     children = root_node.get_children()[0].get_children()[1].get_children() ## TEST OPCUA SERVER
     # children = root_node.get_child(["0:Objects","3:ServerInterfaces"]).get_children()[0].get_children() #OFFICAL PATH
@@ -48,11 +50,18 @@ def get_tags(root_node):
     # print(children)
     for child in children:
         if child.get_node_class() == opcua.ua.NodeClass.Variable:
-            tags.append((child.get_display_name().Text, child.get_value()))
+            tags.append({"timestamp": child.get_data_value().SourceTimestamp.isoformat(), 
+                         "name":child.get_display_name().Text, 
+                         "value": child.get_value()})
+            
+            tags_sqlite.append([child.get_data_value().SourceTimestamp.isoformat(), 
+                               child.get_display_name().Text,
+                               child.get_value()])
         elif child.get_node_class() == opcua.ua.NodeClass.Object:
             tags.extend(get_tags(child))
-            
-    return tags
+            tags_sqlite.extend(get_tags(child))
+
+    return tags, tags_sqlite
 
 # connect_to_gd_opcua('opc.tcp://192.168.1.10:4840')
 read_tags_from_gd()
