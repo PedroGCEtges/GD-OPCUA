@@ -1,5 +1,7 @@
 import os
 import threading
+import tkinter as tk
+import opcua_client_gd
 
 def start_program(progam_name):
         os.system('python {}'.format(progam_name))
