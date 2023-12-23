@@ -4,6 +4,7 @@ from alarm import mostrar_alerta
 from db_utils import create_collection
 import time
 import opcua
+
 def create_station_tags_to_test(myobj, idx, tags):
     build_tags = []
     for tag in tags:
