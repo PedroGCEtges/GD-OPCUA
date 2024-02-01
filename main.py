@@ -7,7 +7,7 @@ def start_program(progam_name):
         os.system('python {}'.format(progam_name))
 
 def main():# __name__ == "__main__":
-        files = ["opcua_client_gd.py","middleware.py"]
+        files = ["client_dist.py","client_pp.py","client_sort.py","middleware.py"]
         process = []
 
         for file in files:

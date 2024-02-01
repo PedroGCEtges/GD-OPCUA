@@ -176,6 +176,23 @@ def check_piece_status(tag, conn, df, caracteristica = 'Tampada'):
                 
     return peca
 
+def set_station_initial_cycle(conn, sensor_entrada="B_I4", sensor_saida="G3"):
+    inicio = pd.read_sql_query(f'SELECT * FROM \"{sensor_entrada}\" WHERE value = 1 ORDER BY timestamp', conn)
+    fim =  pd.read_sql_query(f'SELECT * FROM \"{sensor_saida}\" WHERE value = 1 ORDER BY timestamp', conn)
+    
+    fim.rename(columns={'value': 'value_fim'}, inplace=True)
+    fim.rename(columns={'timestamp': 'timestamp_fim'}, inplace=True)
+    fim.rename(columns={'timestamp_delta': 'timestamp_delta_fim'}, inplace=True)
+
+    inicio.rename(columns={'value': 'value_inicio'}, inplace=True)
+    inicio.rename(columns={'timestamp': 'timestamp_inicio'}, inplace=True)
+    df = pd.concat([inicio, fim], axis=1)
+
+    return df
+
+
+
+
 # query1 = "CREATE TABLE peca (inicio_ciclo TEXT,fim_ciclo TEXT, tampa BOOLEAN, material TEXT, cor TEXT);"
 # query2 = "INSERT INTO peca (inicio_ciclo) SELECT timestamp FROM \"B_I4\";"
 # query3 = "INSERT INTO peca (fim_ciclo) SELECT timestamp FROM \"G3\";"

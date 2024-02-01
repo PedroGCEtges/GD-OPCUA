@@ -4,6 +4,8 @@ from time_normalizer import get_cursor_and_conn, get_first_time_in_interval_from
 from working_cycle import check_piece_status, create_df_for_every_table, filter_rows, generate_intervals_table, set_station_cycle
 from delete_tables import delete_tables
 from create_tag_tables import create_tag_tables
+import pandas as pd
+
 
 class StationPiece:
     def __init__(self, cursor, conn, start_date, end_date, piece_status, sensor_entrada, sensor_saida, carac):
@@ -91,9 +93,23 @@ def calculate_proc_time(d):
         l.append(round(proc_time))
     return l
 
-def create_delivery_time():
-    x = []
-    l = []
+def create_delivery_time(conn, sensor_entrada, sensor_saida):
+
+    inicio = pd.read_sql_query(f'SELECT * FROM \"{sensor_entrada}\" WHERE value = 1 ORDER BY timestamp', conn)
+    fim =  pd.read_sql_query(f'SELECT * FROM \"{sensor_saida}\" WHERE value = 1 ORDER BY timestamp', conn)
+    proc_time = []
+
+    ''' Se len(inicio) > len(fim) então no período mmarcado há uma peça que nao terminou o proc,
+            retirar o ultimo de inicio
+        Se len(inicio) < len(fim) então no periodo marcado havia uma peça já em processamento, 
+            fácil de verificar pelo timestampdelta
+    '''
+
+    for i in range(len(inicio)):
+        proc_time.append(fim[i] - inicio[i])
+    
+
+
     '''Os time_in de aprovada e rejeitada são os mesmos, pois é o sensor de peça no
         magazine'''
     for i in rfid['Operations'][0]['Aprovada']:
