@@ -1,20 +1,35 @@
 import os
 import threading
 import tkinter as tk
-import opcua_client_gd
+import subprocess
+import json
 
-def start_program(progam_name):
-        os.system('python {}'.format(progam_name))
+def start_program(program_name):
+        try:
+                os.system('python {}'.format(program_name))
+                # subprocess.run(['python', program_name], check=True)
+        except subprocess.CalledProcessError as e:
+                print(f"Error running {program_name}: {e}")
+        # finally:
+        #         os._exit(0)
 
-def main():# __name__ == "__main__":
+def main():
         files = ["client_dist.py","client_pp.py","client_sort.py","middleware.py"]
         process = []
-
-        for file in files:
-                process.append(threading.Thread(target=start_program, args=(file,)))
-        for p in process:
-                p.start()
-main()
+        try:
+                for file in files:
+                        p = threading.Thread(target=start_program, args=(file,))
+                        process.append(p)
+                        p.start()
+                for p in process:
+                        p.join()
+        except Exception as e:
+                for p in process:
+                        p.join()
+                os._exit(0)
+        
+if __name__ == "__main__":
+    main()
 
 # def main():
 #     # task1 = asyncio.create_task(connect_to_gd_opcua())

@@ -7,7 +7,7 @@ janela = Tk()
 
 def tocar_buzina():
     mixer.init()
-    mixer.music.load("alarm.mp3")
+    mixer.music.load("alarms/alarm.mp3")
     mixer.music.play(0)
 
 

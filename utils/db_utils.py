@@ -21,16 +21,16 @@ def get_tags_interval_date(start, end, collection):
         documents.append(document)
         print(document)
 
-def create_sqlite():
+def create_sqlite(name="opcua.db"):
     # criar uma conexão SQLite e se conectar ao banco de dados SQLite
-    sqlite_conn = sqlite3.connect("opcua.db")
+    sqlite_conn = sqlite3.connect(name)
     sqlite_cur = sqlite_conn.cursor()
 
     # criar uma tabela SQLite se não existir
     sqlite_cur.execute("CREATE TABLE IF NOT EXISTS opcua_data (tag TEXT, value TEXT, timestamp TEXT)")
     return sqlite_cur, sqlite_conn
 
-def add_tags_to_sqlite(tags, sqlite = create_sqlite()):
+def add_tags_to_sqlite(tags, sqlite):
     sqlite_cur, sqlite_conn = sqlite
     
     for tag in tags:

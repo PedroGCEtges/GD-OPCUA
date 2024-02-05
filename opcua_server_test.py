@@ -26,5 +26,5 @@ def create_gd_opcua_sim(opctcp="opc.tcp://localhost:4840", uri="https://example.
         server.stop()
         print("Servidor OPC UA parado")
         
-create_gd_opcua_sim()
-create_gd_opcua_sim("opc.tcp://localhost:4841", "https://example.com/opcua1" )
+# create_gd_opcua_sim()
+# create_gd_opcua_sim("opc.tcp://localhost:4841", "https://example.com/opcua1" )
